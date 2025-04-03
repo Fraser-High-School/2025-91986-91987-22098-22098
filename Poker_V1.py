@@ -29,19 +29,19 @@ cpu_hand = []
 
 board = []
 
-# Welcome the user to the game and asks for a initial bet
+# Welcome the user to the game 
 
 print()
 print("Welcome To Texas Hold-Em Python")
 print(f"You Currently Have ${money} To Bet With \n")
-
+# asks for a initial bet and makes sure its a number
 while True:
     try:
-        bet_amount = int(input("How Much Do You Want To Bet? (Default is $20) \n"))
-        if bet_amount < 20:
+        bet_amount = input("How Much Do You Want To Bet? (Default is $20) \n")
+        if int(bet_amount) < 20:
             bet_amount = 20
             break
-        elif bet_amount >= money:
+        elif int(bet_amount) >= money:
             bet_amount = money
             break
         else:
@@ -49,20 +49,43 @@ while True:
     except ValueError:
         print(f"{bet_amount} Isnt a number")
 
-if bet_amount < money:
-    print(f"\nYou have Chosen To Bet ${bet_amount} \n")
-else:
-    print(f"\nYou have Chosen To Go All In \n")
+# tell user balance and how much they are playing for
+money -= int(bet_amount)
+print(f"\nBalance: ${money}")
+print(f"You have ${bet_amount} On This Hand \n")
 
 '''
 # ============================ ADD DEALING DECK TO THE USER AND CPU =========================== #
 '''
 
+# deals 2 cards to the user and the cpu then removes from the deck
 cardsdealt = 0
 
 while cardsdealt < 2:
     card = random.randint(0, len(deck) - 1)
-    print(card)
-    print(deck[card])
+    player_hand.append(deck[card])
+    deck.pop(card)
+
+    card_2 = random.randint(0, len(deck) - 1)
+    cpu_hand.append(deck[card_2])
+    deck.pop(card_2)
 
     cardsdealt += 1
+
+print(f"Your deck {player_hand}\n")
+
+'''
+# ======================================== Add the cards to the table =======================================#
+'''
+
+flopcardsdealt = 0
+
+while flopcardsdealt < 3:
+    card = random.randint(0, len(deck) - 1)
+    board.append(deck[card])
+    deck.pop(card)
+
+    flopcardsdealt += 1
+
+print(f"Table{board}")
+
