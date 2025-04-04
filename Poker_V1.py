@@ -22,6 +22,7 @@ deck = [
 random.shuffle(deck)
 
 money = 100
+fold = False
 
 # Create the decks
 player_hand = []
@@ -75,9 +76,27 @@ while cardsdealt < 2:
 print(f"Your deck {player_hand}\n")
 
 '''
+# =========================================== first betting round ===========================================#
+'''
+
+action_r1 = input("what do you want to do (check, raise, fold)?\n")
+
+if action_r1.lower() == "raise":
+    betamnt = int(input("\nHow much do you want to bet? "))
+    print(betamnt)
+elif action_r1.lower() == "fold":
+    fold = True
+
+# tell user balance and how much they are playing for
+money -= betamnt
+print(f"\nBalance: ${money}")
+print(f"You have ${int(bet_amount) + betamnt} On This Hand \n")
+
+'''
 # ======================================== Add the cards to the table =======================================#
 '''
 
+# deal 3 cards to the table then remove them from the deck
 flopcardsdealt = 0
 
 while flopcardsdealt < 3:
@@ -87,5 +106,17 @@ while flopcardsdealt < 3:
 
     flopcardsdealt += 1
 
-print(f"Table{board}")
+print(f"Table {board}\n")
 
+'''
+# =========================================== second betting round ===========================================#
+'''
+
+action_r2 = input("what do you want to do (check, raise, fold)?\n")
+
+if action_r2.lower() == "raise":
+    betamnt = int(input("How much do you want to bet? "))
+    bet_amount += betamnt
+    print(bet_amount)
+elif action_r2.lower() == "fold":
+    fold = True
