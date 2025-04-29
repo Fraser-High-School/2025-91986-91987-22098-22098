@@ -30,6 +30,24 @@ cpu_hand = []
 
 board = []
 
+
+def betting_round():
+    global bet_amount, money
+    action = input("what do you want to do (check, raise, fold)?\n")
+
+    if action.lower() == "raise":
+        betamnt = int(input("\nHow much do you want to bet? "))
+        bet_amount = int(bet_amount) + betamnt
+        
+        # tell user balance and how much they are playing for
+        money -= betamnt
+        print(f"\nBalance: ${money}")
+        print(f"You have ${bet_amount} On This Hand \n")
+    elif action.lower() == "fold":
+        fold
+        # break
+
+
 # Welcome the user to the game 
 
 print()
@@ -79,20 +97,7 @@ print(f"Your deck {player_hand}\n")
 # =========================================== first betting round ===========================================#
 '''
 
-action_r1 = input("what do you want to do (check, raise, fold)?\n")
-
-if action_r1.lower() == "raise":
-    betamnt = int(input("\nHow much do you want to bet? "))
-    bet_amount = int(bet_amount) + betamnt
-    
-    # tell user balance and how much they are playing for
-    money -= betamnt
-    print(f"\nBalance: ${money}")
-    print(f"You have ${bet_amount} On This Hand \n")
-elif action_r1.lower() == "fold":
-    fold = True
-
-
+betting_round()
 
 '''
 # ======================================== Add the cards to the table =======================================#
@@ -114,18 +119,7 @@ print(f"Table {board}\n")
 # =========================================== second betting round ===========================================#
 '''
 
-action_r2 = input("what do you want to do (check, raise, fold)?\n")
-
-if action_r2.lower() == "raise":
-    betamnt = int(input("\nHow much do you want to bet? "))
-    bet_amount = int(bet_amount) + betamnt
-    
-    # tell user balance and how much they are playing for
-    money -= betamnt
-    print(f"\nBalance: ${money}")
-    print(f"You have ${bet_amount} On This Hand \n")
-elif action_r2.lower() == "fold":
-    fold = True
+betting_round()
 
 '''
 # ======================================== Add another card to the table =======================================#
@@ -145,18 +139,28 @@ print(f"\nTable {board}\n")
 # =========================================== third betting round ===========================================#
 '''
 
-action_r3 = input("what do you want to do (check, raise, fold)?\n")
+betting_round()
 
-if action_r3.lower() == "raise":
-    betamnt = int(input("\nHow much do you want to bet? "))
-    bet_amount = int(bet_amount) + betamnt
-    
-    # tell user balance and how much they are playing for
-    money -= betamnt
-    print(f"\nBalance: ${money}")
-    print(f"You have ${bet_amount} On This Hand \n")
-elif action_r3.lower() == "fold":
-    fold = True
+
+'''
+# ======================================== Add final card to the table =======================================#
+'''
+
+# deal 1 card to the table then remove them from the deck
+card = random.randint(0, len(deck) - 1)
+board.append(deck[card])
+deck.pop(card)
+
+print(f"You have ${bet_amount} On This Hand ")
+print(f"Your deck {player_hand}\n")
+
+print(f"\nTable {board}\n")
+
+'''
+# =========================================== final betting round ===========================================#
+'''
+
+betting_round()
 
 
 '''
@@ -168,69 +172,35 @@ cpu_check = cpu_hand + board
 cpu_win = 0
 win = 0
 
-def check_hand(hand):
-    hearts = 0
-    diamonds = 0
-    spades = 0
-    clubs = 0
-    global win
-    global cpu_win
+def check_hand(hand, is_cpu = False):
+    suits_count = {"♥️": 0, "♦️": 0, "♠️": 0, "♣️": 0}
+    global win, cpu_win
 
-
-    for i in hand:
-        if "♥️" in i:
-            hearts += 1
-        if "♦️" in i:
-            diamonds += 1
-        if "♠️" in i:
-            spades += 1
-        if "♣️" in i:
-            clubs += 1
-    
     ## eval winner
 
-    if hand == cpu_check:
-        
-        if hearts == 3 or diamonds == 3 or spades == 3 or clubs == 3:
-            cpu_win = 3
-        elif hearts == 2 or diamonds == 2 or spades == 2 or clubs == 2:
-            cpu_win = 2
-        elif hearts == 1 or diamonds == 1 or spades == 1 or clubs == 1:
-            cpu_win = 1
+    for card in hand:
+        for suit in suits_count:
+            if suit in card:
+                suits_count[suit] += 1
+
+    max_amount = max(suits_count.values())
+
+    if is_cpu == True:
+        cpu_win = max_amount
     else:
+        win = max_amount
 
-        if hearts == 3 or diamonds == 3 or spades == 3 or clubs == 3:
-            win = 3
-        elif hearts == 2 or diamonds == 2 or spades == 2 or clubs == 2:
-            win = 2
-        elif hearts == 1 or diamonds == 1 or spades == 1 or clubs == 1:
-            win = 1
-
-
-check_hand(hand=player_check)
-check_hand(hand=cpu_check)
+check_hand(hand=player_check, is_cpu=False)
+check_hand(hand=cpu_check, is_cpu=True)
 
 
 print("\nGame Over")
 print(f"Opponent had {cpu_hand}")
 
-print(win)
-print(cpu_win)
 
 if win > cpu_win:
-    print(f"you won ${int(bet_amount) * 2}")
+    print(f"You Qon ${int(bet_amount) * 2}!")
 elif win == cpu_win:
-    print(f"you draw you get ${bet_amount} back")
+    print(f"You drawed, your ${bet_amount} is refunded")
 else:
-    print(f"You lost ${bet_amount}")
-
-
-
-
-'''
-#
-# 
-#!!!!!  NOTE MUST ADD ONE MORE CARD TO TABLE!!!!!!!
-# 
-# 
-'''
+    print(f"You Lost ${bet_amount}")
