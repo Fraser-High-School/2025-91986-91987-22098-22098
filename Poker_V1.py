@@ -173,17 +173,28 @@ cpu_win = 0
 win = 0
 
 def check_hand(hand, is_cpu = False):
+    value_count = {"A": 0, "K": 0, "Q": 0, "J": 0, "10": 0, "9": 0, "8": 0, "7": 0, "6": 0, "5": 0, "4": 0, "3": 0, "2": 0}
     suits_count = {"♥️": 0, "♦️": 0, "♠️": 0, "♣️": 0}
     global win, cpu_win
 
     ## eval winner
 
     for card in hand:
+        for num in value_count:
+            if num in card:
+                value_count[num] +=1
         for suit in suits_count:
             if suit in card:
                 suits_count[suit] += 1
 
-    max_amount = max(suits_count.values())
+    # make new dict with just A,K,Q,K,10
+    royal_flush_items = list(value_count.items())[:5]
+    royal_flush = dict(royal_flush_items)
+
+    print(royal_flush)
+    print(royal_flush_items)
+
+    max_amount = max(value_count.values())
 
     if is_cpu == True:
         cpu_win = max_amount
@@ -199,7 +210,7 @@ print(f"Opponent had {cpu_hand}")
 
 
 if win > cpu_win:
-    print(f"You Qon ${int(bet_amount) * 2}!")
+    print(f"You Won ${int(bet_amount) * 2}!")
 elif win == cpu_win:
     print(f"You drawed, your ${bet_amount} is refunded")
 else:
