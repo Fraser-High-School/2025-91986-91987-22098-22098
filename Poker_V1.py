@@ -172,34 +172,78 @@ cpu_check = cpu_hand + board
 cpu_win = 0
 win = 0
 
+def get_hand_name(rank):
+    hand_names = {
+        9: "Royal Flush",
+        8: "Straight Flush",
+        7: "Four of a Kind",
+        6: "Full House",
+        5: "Flush",
+        4: "Straight",
+        3: "Three of a Kind",
+        2: "Two Pair",
+        1: "One Pair",
+        0: "High Card"
+    }
+    return hand_names[rank]
+
 def check_hand(hand, is_cpu = False):
-    value_count = {"A": 0, "K": 0, "Q": 0, "J": 0, "10": 0, "9": 0, "8": 0, "7": 0, "6": 0, "5": 0, "4": 0, "3": 0, "2": 0}
-    suits_count = {"♥️": 0, "♦️": 0, "♠️": 0, "♣️": 0}
     global win, cpu_win
 
-    ## eval winner
-
+    # maps all the values of the cards to how good they are
+    values = []
+    suits = []
+    value_map = {"A": 14, "K": 13, "Q": 12, "J": 11, "10": 10, "9": 9, "8": 8, "7": 7, "6": 6, "5": 5, "4": 4, "3": 3, "2": 2}
+    
     for card in hand:
-        for num in value_count:
-            if num in card:
-                value_count[num] +=1
-        for suit in suits_count:
-            if suit in card:
-                suits_count[suit] += 1
+        # Extract value (everything except the last character)
+        value = card[:-2]
+        # Extract suit (anything thats not the last character)
+        suit = card[-2:]
+        
+        values.append(value)
+        suits.append(suit)
+    # Convert values to a number for easier comparison
+    numeric_values = []
+    for v in values:
+        v = value_map[v]
+        numeric_values.append(v)
 
-    # make new dict with just A,K,Q,K,10
-    royal_flush_items = list(value_count.items())[:5]
-    royal_flush = dict(royal_flush_items)
+    # checks if the value is alredy in the count then add one else add that value
+    value_counts = {}
+    for value in values:
+        if value in value_counts:
+            value_counts[value] += 1
+        else:
+            value_counts[value] = 1
+    
+    # checks if the suit is alredy in the count then add one else add that suit
+    suits_count = {}
+    for suit in suits:
+        if suit in suits_count:
+            suits_count[suit] += 1
+        else:
+            suits_count[suit] = 1
+    
+    # Check for flush (all cards of the same suit)
+    is_flush = False
+    for suit, count in suits_count.items():
+        if count >= 5:
+            is_flush = True
 
-    print(royal_flush)
-    print(royal_flush_items)
 
-    max_amount = max(value_count.values())
+    # check if 5 cards are the same suit, and check if there is a A,K,Q,K,10
+    if is_flush and set([14, 13, 12, 11, 10]).issubset(set(numeric_values)):
+        hand_rank = 9
+        high_card = 14  # Ace high card
 
-    if is_cpu == True:
-        cpu_win = max_amount
+    # Store the result
+    result = (hand_rank, high_card)
+    
+    if is_cpu:
+        cpu_win = result
     else:
-        win = max_amount
+        win = result
 
 check_hand(hand=player_check, is_cpu=False)
 check_hand(hand=cpu_check, is_cpu=True)
@@ -208,10 +252,28 @@ check_hand(hand=cpu_check, is_cpu=True)
 print("\nGame Over")
 print(f"Opponent had {cpu_hand}")
 
+print(f"Your hand: {get_hand_name(win[0])}")
+print(f"CPU hand: {get_hand_name(cpu_win[0])}")
 
-if win > cpu_win:
+# checks win based on if in the result variable if the rank is higher, then if not then checks whose high card is higher 
+# for future reference (win[0] = rank, win[1] = high_card)
+
+if win[0] > cpu_win[0]:
     print(f"You Won ${int(bet_amount) * 2}!")
-elif win == cpu_win:
-    print(f"You drawed, your ${bet_amount} is refunded")
-else:
+elif win[0] < cpu_win[0]:
     print(f"You Lost ${bet_amount}")
+elif win[1] > cpu_win[1]:
+    print(f"You Won ${int(bet_amount) * 2} with a higher card!")
+elif win[1] < cpu_win[1]:
+    print(f"You Lost ${bet_amount} with a lower card")
+else:
+    print(f"You drew, your ${bet_amount} is refunded")
+
+
+'''
+CURRENTLY DOESNT WORK TO RUN BECAUSE IT DOESNT LIKE THAT ONLY 1 RANK IS DEFINED
+'''
+
+'''
+NOTE tom wants an elo system
+'''
