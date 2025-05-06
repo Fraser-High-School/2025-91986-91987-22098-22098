@@ -2,7 +2,31 @@
 
 import random
 
-deck = [
+money = 100
+
+def betting_round():
+    global bet_amount, money
+    while True:
+        action = input("what do you want to do (check, raise, fold)?\n")
+
+        if action.lower() == "raise" or action.lower() == "r":
+            betamnt = int(input("\nHow much do you want to bet? "))
+            bet_amount = int(bet_amount) + betamnt
+            
+            # tell user balance and how much they are playing for
+            money -= betamnt
+            print(f"\nBalance: ${money}")
+            print(f"You have ${bet_amount} On This Hand \n")
+            break
+        elif action.lower() == "fold" or action.lower() == "f":
+            exit()
+        elif action.lower() == "check" or action.lower() == "c":
+            break
+        else:
+            continue
+
+while True:
+    deck = [
     "K♣️", "K♠️", "K♥️", "K♦️",
     "Q♣️", "Q♠️", "Q♥️", "Q♦️",
     "J♣️", "J♠️", "J♥️", "J♦️",
@@ -16,35 +40,15 @@ deck = [
     "3♣️", "3♠️", "3♥️", "3♦️",
     "2♣️", "2♠️", "2♥️", "2♦️",
     "A♣️", "A♠️", "A♥️", "A♦️",
-]
+    ]
 
-# Shuffle the deck
-random.shuffle(deck)
+    # Shuffle the deck
+    random.shuffle(deck)
 
-money = 100
-fold = False
-
-def betting_round():
-    global bet_amount, money
-    action = input("what do you want to do (check, raise, fold)?\n")
-
-    if action.lower() == "raise":
-        betamnt = int(input("\nHow much do you want to bet? "))
-        bet_amount = int(bet_amount) + betamnt
-        
-        # tell user balance and how much they are playing for
-        money -= betamnt
-        print(f"\nBalance: ${money}")
-        print(f"You have ${bet_amount} On This Hand \n")
-    elif action.lower() == "fold":
-        fold
-        # break
-
-while True:
     # Create the decks
     player_hand = []
     cpu_hand = []
-
+    starting_money = money
     board = []
 
     # Welcome the user to the game 
@@ -336,19 +340,28 @@ while True:
 
     if win[0] > cpu_win[0]:
         print(f"You Won ${int(bet_amount) * 2}!")
-        print(f"\nBalance: ${money + (int(bet_amount) * 3)}")
+        if money == 0:
+            money = (int(bet_amount) * 2)
+        else:
+            money = (starting_money + (int(bet_amount) * 2))
+        print(f"\nBalance: ${money}")
     elif win[0] < cpu_win[0]:
         print(f"You Lost ${bet_amount}")
         print(f"\nBalance: ${money}")
     elif win[1] > cpu_win[1]:
         print(f"You Won ${int(bet_amount) * 2} with a higher card!")
-        print(f"\nBalance: ${money + (int(bet_amount) * 3)}")
+        if money == 0:
+            money = (int(bet_amount) * 2)
+        else:
+            money = (starting_money + (int(bet_amount) * 2))
+        print(f"\nBalance: ${money}")
     elif win[1] < cpu_win[1]:
         print(f"You Lost ${bet_amount} with a lower card")
         print(f"\nBalance: ${money}")
     else:
         print(f"You drew, your ${bet_amount} is refunded")
-        print(f"\nBalance: ${money + int(bet_amount)}")
+        money = starting_money
+        print(f"\nBalance: ${money}")
 
     play_again = input("do you want to play again?\n")
     if money < 20:
@@ -357,11 +370,7 @@ while True:
         exit()
 
 
-
-'''
-fix if your at $0 you get more money
-'''
-
 '''
 NOTE tom wants an elo system
+game finished, add GUI next
 '''
