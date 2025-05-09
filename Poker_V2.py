@@ -5,8 +5,6 @@ menu = Tk()
 menu.title("Main Menu - Texas Hold-Em Poker")
 menu.geometry("800x600")
 
-
-
 money = 100
 
 deck = [
@@ -38,18 +36,45 @@ title_label = Label(menu, text="Welcome To Texas Hold-Em Python", pady="15px")
 title_label.pack()
 
 def play_game():
+    global bet_amount, bet_display, money
     game = Toplevel(menu)
     game.title("Texas Hold-Em Poker")
     game.geometry("800x600")
     game.focus()
 
-    money_label = Label(game, text=f"You Currently Have ${money} To Bet With", pady="25px")
-    money_label.pack()
+    bet_question = Label(game, text="How Much Do You Want To Bet? (Default is $20)", pady="15px")
+    bet_question.pack()
+    bet_input = Text(game, height=1, width=5)
+    bet_input.pack()
+
+    bet_display = Label(game, text="Current Bet: $0")
+    bet_display.pack(pady=(25, 0))
+    
+    def on_enter_pressed(key):
+        global money, bet_amount
+        try:
+            # Get the text from the input widget and strip whitespace
+            bet_text = bet_input.get("1.0", "end-1c").strip()
+        
+            if int(bet_text) < 20:
+                bet_amount = 20
+            elif int(bet_text) >= money:
+                bet_amount = money
+
+            money -= bet_amount
+            
+            balance = Label(game, text=f"Balance: ${money}")
+            balance.pack()
+            # Update the display label
+            bet_display.config(text=f"You have ${bet_amount} On This Hand")
+            
+        except ValueError:
+            bet_display.config(text="Please enter a valid number")
+    
+    # Bind the Enter key to the text widget
+    bet_input.bind("<Return>", on_enter_pressed)
 
 play_button = Button(menu, text="Play", width="15", command=play_game)
 play_button.pack()
-
-
-
 
 menu.mainloop()
