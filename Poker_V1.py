@@ -1,18 +1,36 @@
-"""A Texas Hold-Em Poker in Python"""
+"""A Texas Hold-Em Poker in Python."""
 
 import random
+import winsound
 
 money = 100
 
+
 def betting_round():
+    """Start a betting round."""
+
+
     global bet_amount, money
     while True:
-        action = input("what do you want to do (check, raise, fold)?\n")
+        action = input("What do you want to do (check, raise, fold)?\n")
 
         if action.lower() == "raise" or action.lower() == "r":
-            betamnt = int(input("\nHow much do you want to bet? "))
+            while True:
+                try:
+                    betamnt = int(input("\nHow much do you want to bet?\n$"))
+                    if int(betamnt) < 20:
+                        betamnt = 20
+                        break
+                    elif int(betamnt) >= money:
+                        betamnt = money
+                        break
+                    else:
+                        break
+                except ValueError:
+                    print(f"{betamnt} Isnt a number")
+
             bet_amount = int(bet_amount) + betamnt
-            
+
             # tell user balance and how much they are playing for
             money -= betamnt
             print(f"\nBalance: ${money}")
@@ -23,6 +41,7 @@ def betting_round():
         elif action.lower() == "check" or action.lower() == "c":
             break
         else:
+            print("\nPlease choose one of the following: check, raise, fold")
             continue
 
 while True:
@@ -51,15 +70,17 @@ while True:
     starting_money = money
     board = []
 
-    # Welcome the user to the game 
+    # Welcome the user to the game
 
+    print()
+    print("-----------------------------------------------------------------")
     print()
     print("Welcome To Texas Hold-Em Python")
     print(f"You Currently Have ${money} To Bet With \n")
     # asks for a initial bet and makes sure its a number
     while True:
         try:
-            bet_amount = input("How Much Do You Want To Bet? (Default is $20) \n")
+            bet_amount = input("How Much Do You Want To Bet? (Default is $20) \n$")
             if int(bet_amount) < 20:
                 bet_amount = 20
                 break
@@ -73,6 +94,7 @@ while True:
 
     # tell user balance and how much they are playing for
     money -= int(bet_amount)
+    print("-----------------------------------------------------------------")
     print(f"\nBalance: ${money}")
     print(f"You have ${bet_amount} On This Hand \n")
 
@@ -94,7 +116,7 @@ while True:
 
         cardsdealt += 1
 
-    print(f"Your hand {player_hand}\n")
+    print(f"Your hand: {' , '.join(player_hand)}\n")
 
     '''
     # =========================================== first betting round ===========================================#
@@ -116,7 +138,11 @@ while True:
 
         flopcardsdealt += 1
 
-    print(f"Table {board}\n")
+    print("-----------------------------------------------------------------")
+    print(f"\nYou have ${bet_amount} On This Hand ")
+    print(f"Your hand {' , '.join(player_hand)}\n")
+
+    print(f"Table {' , '.join(board)}\n")
 
     '''
     # =========================================== second betting round ===========================================#
@@ -133,17 +159,17 @@ while True:
     board.append(deck[card])
     deck.pop(card)
 
-    print(f"You have ${bet_amount} On This Hand ")
-    print(f"Your hand {player_hand}\n")
+    print("-----------------------------------------------------------------")
+    print(f"\nYou have ${bet_amount} On This Hand ")
+    print(f"Your hand {' , '.join(player_hand)}\n")
 
-    print(f"\nTable {board}\n")
+    print(f"\nTable {' , '.join(board)}\n")
 
     '''
     # =========================================== third betting round ===========================================#
     '''
 
     betting_round()
-
 
     '''
     # ======================================== Add final card to the table =======================================#
@@ -154,17 +180,17 @@ while True:
     board.append(deck[card])
     deck.pop(card)
 
+    print("-----------------------------------------------------------------")
     print(f"You have ${bet_amount} On This Hand ")
-    print(f"Your hand {player_hand}\n")
+    print(f"Your hand {' , '.join(player_hand)}\n")
 
-    print(f"\nTable {board}\n")
+    print(f"\nTable {' , '.join(board)}\n")
 
     '''
     # =========================================== final betting round ===========================================#
     '''
 
     betting_round()
-
 
     '''
     # =========================================== detirmine winners round ===========================================#
@@ -328,10 +354,10 @@ while True:
     check_hand(hand=player_check, is_cpu=False)
     check_hand(hand=cpu_check, is_cpu=True)
 
+    print("-----------------------------------------------------------------")
+    print("\nGAME OVER\n")
 
-    print("\nGame Over")
-    print(f"Opponent had {cpu_hand}")
-
+    print(f"Opponent had {' , '.join(cpu_hand)}")
     print(f"Your hand: {get_hand_name(win[0])}")
     print(f"CPU hand: {get_hand_name(cpu_win[0])}")
 
@@ -339,6 +365,7 @@ while True:
     # for future reference (win[0] = rank, win[1] = high_card)
 
     if win[0] > cpu_win[0]:
+        winsound.PlaySound("win.wav", winsound.SND_FILENAME)
         print(f"You Won ${int(bet_amount) * 2}!")
         if money == 0:
             money = (int(bet_amount) * 2)
@@ -349,6 +376,7 @@ while True:
         print(f"You Lost ${bet_amount}")
         print(f"\nBalance: ${money}")
     elif win[1] > cpu_win[1]:
+        winsound.PlaySound("win.wav", winsound.SND_FILENAME)
         print(f"You Won ${int(bet_amount) * 2} with a higher card!")
         if money == 0:
             money = (int(bet_amount) * 2)
@@ -363,12 +391,12 @@ while True:
         money = starting_money
         print(f"\nBalance: ${money}")
 
-    play_again = input("do you want to play again?\n")
+    play_again = input("Do you want to play again? (yes or no)\n")
     if money < 20:
+        print("You're too broke to play again")
         exit()
-    elif play_again == "no" or play_again == "n":
+    elif play_again.lower() == "no" or play_again.lower() == "n":
         exit()
-
 
 '''
 NOTE tom wants an elo system
