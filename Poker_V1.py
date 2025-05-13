@@ -5,11 +5,8 @@ import winsound
 
 money = 100
 
-
 def betting_round():
     """Start a betting round."""
-
-
     global bet_amount, money
     while True:
         action = input("What do you want to do (check, raise, fold)?\n")
@@ -43,6 +40,24 @@ def betting_round():
         else:
             print("\nPlease choose one of the following: check, raise, fold")
             continue
+
+def deal_cards(cardsdealt, max):
+    """deal cards to the table"""
+    while cardsdealt < max:
+        card = random.randint(0, len(deck) - 1)
+        board.append(deck[card])
+        deck.pop(card)
+
+        cardsdealt += 1
+    else:
+        cardsdealt = 0
+
+def update_player():
+    """updates player"""
+    print("-----------------------------------------------------------------")
+    print(f"\nYou have ${bet_amount} On This Hand ")
+    print(f"Your hand {' , '.join(player_hand)}\n")
+    print(f"Table {' , '.join(board)}\n")
 
 while True:
     deck = [
@@ -99,7 +114,7 @@ while True:
     print(f"You have ${bet_amount} On This Hand \n")
 
     '''
-    # ============================ ADD DEALING DECK TO THE USER AND CPU =========================== #
+    # ============================ ADD Cards TO THE USER AND CPU & bet =========================== #
     '''
 
     # deals 2 cards to the user and the cpu then removes from the deck
@@ -110,6 +125,7 @@ while True:
         player_hand.append(deck[card])
         deck.pop(card)
 
+        #cpu
         card_2 = random.randint(0, len(deck) - 1)
         cpu_hand.append(deck[card_2])
         deck.pop(card_2)
@@ -118,78 +134,32 @@ while True:
 
     print(f"Your hand: {' , '.join(player_hand)}\n")
 
-    '''
-    # =========================================== first betting round ===========================================#
-    '''
-
     betting_round()
 
     '''
-    # ======================================== Add the cards to the table =======================================#
+    # ======================================== Add the cards to the table & bet =======================================#
     '''
 
-    # deal 3 cards to the table then remove them from the deck
-    flopcardsdealt = 0
-
-    while flopcardsdealt < 3:
-        card = random.randint(0, len(deck) - 1)
-        board.append(deck[card])
-        deck.pop(card)
-
-        flopcardsdealt += 1
-
-    print("-----------------------------------------------------------------")
-    print(f"\nYou have ${bet_amount} On This Hand ")
-    print(f"Your hand {' , '.join(player_hand)}\n")
-
-    print(f"Table {' , '.join(board)}\n")
-
-    '''
-    # =========================================== second betting round ===========================================#
-    '''
-
+    deal_cards(cardsdealt=0, max=3)
+    update_player()
     betting_round()
 
     '''
-    # ======================================== Add another card to the table =======================================#
+    # ======================================== Add another card to the table & bet =======================================#
     '''
 
     # deal 1 card to the table then remove them from the deck
-    card = random.randint(0, len(deck) - 1)
-    board.append(deck[card])
-    deck.pop(card)
-
-    print("-----------------------------------------------------------------")
-    print(f"\nYou have ${bet_amount} On This Hand ")
-    print(f"Your hand {' , '.join(player_hand)}\n")
-
-    print(f"\nTable {' , '.join(board)}\n")
-
-    '''
-    # =========================================== third betting round ===========================================#
-    '''
-
+    deal_cards(cardsdealt=0, max=1)
+    update_player()
     betting_round()
 
     '''
-    # ======================================== Add final card to the table =======================================#
+    # ======================================== Add final card to the table & bet =======================================#
     '''
 
     # deal 1 card to the table then remove them from the deck
-    card = random.randint(0, len(deck) - 1)
-    board.append(deck[card])
-    deck.pop(card)
-
-    print("-----------------------------------------------------------------")
-    print(f"You have ${bet_amount} On This Hand ")
-    print(f"Your hand {' , '.join(player_hand)}\n")
-
-    print(f"\nTable {' , '.join(board)}\n")
-
-    '''
-    # =========================================== final betting round ===========================================#
-    '''
-
+    deal_cards(cardsdealt=0, max=1)
+    update_player()
     betting_round()
 
     '''
@@ -253,6 +223,11 @@ while True:
                 suits_count[suit] += 1
             else:
                 suits_count[suit] = 1
+
+        def check_count(amount, card):
+            for value, count in value_counts.items():
+                if count == amount:
+                    card = value_map[value]
         
         # Check for flush (all cards of the same suit)
         is_flush = False
@@ -260,8 +235,6 @@ while True:
             if count >= 5:
                 is_flush = True
 
-
-        
         ### Check for straight (5 consecutive values) ###
         is_straight = False
         unique_values = sorted(numeric_values)
@@ -278,7 +251,6 @@ while True:
                 is_straight = True
                 straight_high = unique_values[i+4]  
 
-        
         # check if 5 cards are the same suit, and check if there is a A,K,Q,K,10 (royal flush)
         if is_flush and set([14, 13, 12, 11, 10]).issubset(set(numeric_values)):
             hand_rank = 9
@@ -293,17 +265,13 @@ while True:
         elif 4 in value_counts.values():
             hand_rank = 7
             # Find the value that appears 4 times
-            for value, count in value_counts.items():
-                if count == 4:
-                    high_card = value_map[value]
+            check_count(card=high_card, amount=4)
 
         # check if there are three cards of one value and two cards of another value (full house)
         elif 3 in value_counts.values() and 2 in value_counts.values():
             hand_rank = 6
             # Find the value that appears 3 times
-            for value, count in value_counts.items():
-                if count == 3:
-                    high_card = value_map[value]
+            check_count(card=high_card, amount=3)
 
         # check if all cards are same suit (flush)
         elif is_flush:
@@ -319,9 +287,7 @@ while True:
         elif 3 in value_counts.values():
             hand_rank = 3
             # Find the value that appears 3 times
-            for value, count in value_counts.items():
-                if count == 3:
-                    high_card = value_map[value]
+            check_count(card=high_card, amount=3)
 
         # checks if two of the values in the hand are greater than two (two pairs)
         elif list(value_counts.values()).count(2) >= 2:
@@ -334,9 +300,7 @@ while True:
         elif 2 in value_counts.values():
             hand_rank = 1
             # Find the value that appears 2 times
-            for value, count in value_counts.items():
-                if count == 2:
-                    high_card = value_map[value]
+            check_count(card=high_card, amount=2)
 
         # if none of the ones earlier just give high card
         else:
@@ -373,6 +337,7 @@ while True:
             money = (starting_money + (int(bet_amount) * 2))
         print(f"\nBalance: ${money}")
     elif win[0] < cpu_win[0]:
+        winsound.PlaySound("lose.wav", winsound.SND_FILENAME)
         print(f"You Lost ${bet_amount}")
         print(f"\nBalance: ${money}")
     elif win[1] > cpu_win[1]:
@@ -384,6 +349,7 @@ while True:
             money = (starting_money + (int(bet_amount) * 2))
         print(f"\nBalance: ${money}")
     elif win[1] < cpu_win[1]:
+        winsound.PlaySound("lose.wav", winsound.SND_FILENAME)
         print(f"You Lost ${bet_amount} with a lower card")
         print(f"\nBalance: ${money}")
     else:
@@ -397,8 +363,3 @@ while True:
         exit()
     elif play_again.lower() == "no" or play_again.lower() == "n":
         exit()
-
-'''
-NOTE tom wants an elo system
-game finished, add GUI next
-'''
