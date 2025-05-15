@@ -238,19 +238,19 @@ while True:
         ### Check for straight (5 consecutive values) ###
         is_straight = False
         unique_values = sorted(numeric_values)
-        
+        straight_high = 0
+
         # Special case for A-5 straight (where A is treated as 1)
-        if set([14, 5, 4, 3, 2]).issubset(set(numeric_values)):
+        if set([14, 2, 3, 4, 5]).issubset(numeric_values):
             is_straight = True
-            straight_high = 5  # 5 is the highest card in A-5 straight
-        
+            straight_high = 5
         # Check for regular straight (5 consecutive cards)
         for i in range(len(unique_values) - 4):
-            # Check if there are 5 consecutive cards by verifying each adjacent pair differs by exactly 1, ensuring accurate calculation
-            if all(unique_values[i+j+1] - unique_values[i+j] == 1 for j in range(4)):
+            # Check if there are 5 consecutive cards
+            if unique_values[i+4] - unique_values[i] == 4:
                 is_straight = True
-                straight_high = unique_values[i+4]  
-
+                straight_high = unique_values[i+4]
+        
         # check if 5 cards are the same suit, and check if there is a A,K,Q,K,10 (royal flush)
         if is_flush and set([14, 13, 12, 11, 10]).issubset(set(numeric_values)):
             hand_rank = 9
