@@ -134,7 +134,6 @@ while True:
 
     print(f"Your hand: {' , '.join(player_hand)}\n")
 
-    betting_round()
 
     '''
     # ======================================== Add the cards to the table & bet =======================================#
@@ -142,7 +141,6 @@ while True:
 
     deal_cards(cardsdealt=0, max=3)
     update_player()
-    betting_round()
 
     '''
     # ======================================== Add another card to the table & bet =======================================#
@@ -151,7 +149,6 @@ while True:
     # deal 1 card to the table then remove them from the deck
     deal_cards(cardsdealt=0, max=1)
     update_player()
-    betting_round()
 
     '''
     # ======================================== Add final card to the table & bet =======================================#
@@ -160,7 +157,6 @@ while True:
     # deal 1 card to the table then remove them from the deck
     deal_cards(cardsdealt=0, max=1)
     update_player()
-    betting_round()
 
     '''
     # =========================================== detirmine winners round ===========================================#
@@ -187,7 +183,7 @@ while True:
         return hand_names[rank]
 
     def check_hand(hand, is_cpu = False):
-        global win, cpu_win
+        global win, cpu_win, high_card
 
         # maps all the values of the cards to how good they are
         values = []
@@ -224,10 +220,13 @@ while True:
             else:
                 suits_count[suit] = 1
 
-        def check_count(amount, card):
+        # Initialize high_card at the beginning, before any hand ranking checks
+        high_card = 0
+
+        def check_count(amount):
             for value, count in value_counts.items():
                 if count == amount:
-                    card = value_map[value]
+                    return value_map[value]
         
         # Check for flush (all cards of the same suit)
         is_flush = False
@@ -235,23 +234,27 @@ while True:
             if count >= 5:
                 is_flush = True
 
-        ### Check for straight (5 consecutive values) ###
+        # Check for straight (5 consecutive values)
         is_straight = False
-        unique_values = sorted(numeric_values)
         straight_high = 0
 
+        # Get unique values and sort them
+        unique_values = sorted(list(set(numeric_values)))
+
         # Special case for A-5 straight (where A is treated as 1)
-        if set([14, 2, 3, 4, 5]).issubset(numeric_values):
+        if 14 in unique_values and all(val in unique_values for val in [2, 3, 4, 5]):
             is_straight = True
             straight_high = 5
-        # Check for regular straight (5 consecutive cards)
-        for i in range(len(unique_values) - 4):
-            # Check if there are 5 consecutive cards
-            if unique_values[i+4] - unique_values[i] == 4:
-                is_straight = True
-                straight_high = unique_values[i+4]
+        else:
+            # Check for regular straight (5 consecutive cards)
+            for i in range(len(unique_values) - 4):
+                # Check if there are 5 consecutive cards
+                if unique_values[i+4] == unique_values[i] + 4:
+                    is_straight = True
+                    straight_high = unique_values[i+4]
+                    break
         
-        # check if 5 cards are the same suit, and check if there is a A,K,Q,K,10 (royal flush)
+        # check if 5 cards are the same suit, and check if there is a A,K,Q,J,10 (royal flush)
         if is_flush and set([14, 13, 12, 11, 10]).issubset(set(numeric_values)):
             hand_rank = 9
             high_card = 14
@@ -261,17 +264,17 @@ while True:
             hand_rank = 8
             high_card = straight_high
 
-        # check if there are four of a card in the hard (four of a kind)
+        # check if there are four of a card in the hand (four of a kind)
         elif 4 in value_counts.values():
             hand_rank = 7
             # Find the value that appears 4 times
-            check_count(card=high_card, amount=4)
+            high_card = check_count(amount=4)
 
         # check if there are three cards of one value and two cards of another value (full house)
         elif 3 in value_counts.values() and 2 in value_counts.values():
             hand_rank = 6
             # Find the value that appears 3 times
-            check_count(card=high_card, amount=3)
+            high_card = check_count(amount=3)
 
         # check if all cards are same suit (flush)
         elif is_flush:
@@ -287,7 +290,7 @@ while True:
         elif 3 in value_counts.values():
             hand_rank = 3
             # Find the value that appears 3 times
-            check_count(card=high_card, amount=3)
+            high_card = check_count(amount=3)
 
         # checks if two of the values in the hand are greater than two (two pairs)
         elif list(value_counts.values()).count(2) >= 2:
@@ -300,7 +303,7 @@ while True:
         elif 2 in value_counts.values():
             hand_rank = 1
             # Find the value that appears 2 times
-            check_count(card=high_card, amount=2)
+            high_card = check_count(amount=2)
 
         # if none of the ones earlier just give high card
         else:
@@ -357,9 +360,15 @@ while True:
         money = starting_money
         print(f"\nBalance: ${money}")
 
-    play_again = input("Do you want to play again? (yes or no)\n")
-    if money < 20:
-        print("You're too broke to play again")
-        exit()
-    elif play_again.lower() == "no" or play_again.lower() == "n":
-        exit()
+    while True:
+        play_again = input("Do you want to play again? (yes or no)\n")
+        if money < 20:
+            print("You're too broke to play again")
+            exit()
+        elif play_again.lower() == "no" or play_again.lower() == "n":
+            exit()
+        elif play_again.lower() == "yes" or play_again.lower() == "y":
+            break
+        else:
+            print("Please choose yes or no")
+            continue
