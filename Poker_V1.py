@@ -133,6 +133,7 @@ while True:
         cardsdealt += 1
 
     print(f"Your hand: {' , '.join(player_hand)}\n")
+    betting_round()
 
 
     '''
@@ -141,6 +142,7 @@ while True:
 
     deal_cards(cardsdealt=0, max=3)
     update_player()
+    betting_round()
 
     '''
     # ======================================== Add another card to the table & bet =======================================#
@@ -149,6 +151,7 @@ while True:
     # deal 1 card to the table then remove them from the deck
     deal_cards(cardsdealt=0, max=1)
     update_player()
+    betting_round()
 
     '''
     # ======================================== Add final card to the table & bet =======================================#
@@ -157,6 +160,7 @@ while True:
     # deal 1 card to the table then remove them from the deck
     deal_cards(cardsdealt=0, max=1)
     update_player()
+    betting_round()
 
     '''
     # =========================================== detirmine winners round ===========================================#
