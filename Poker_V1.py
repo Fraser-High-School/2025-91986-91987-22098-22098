@@ -14,7 +14,7 @@ def betting_round():
         if action.lower() == "raise" or action.lower() == "r":
             while True:
                 try:
-                    betamnt = int(input("\nHow much do you want to bet?\n$"))
+                    betamnt = input("\nHow much do you want to bet?\n$")
                     if int(betamnt) < 20:
                         betamnt = 20
                         break
